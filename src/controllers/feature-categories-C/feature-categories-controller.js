@@ -6,6 +6,10 @@ export const createFeatureCategories = async (req, res) => {
     try {
         const { featureCategoriesName } = req.body
 
+        const feature_category_logo = req.file ? req.file.filename : null
+
+        const feature_category_image = req.file ? req.file.filename : null
+
         const checkfeatureCat = await FeatureCategory.findOne({ featureCategoriesName })
 
         if (checkfeatureCat) {
@@ -15,7 +19,7 @@ export const createFeatureCategories = async (req, res) => {
         }
 
         const newCategories = new FeatureCategory({
-            featureCategoriesName
+            featureCategoriesName, feature_category_logo, feature_category_image
         })
 
         await newCategories.save()
@@ -35,7 +39,7 @@ export const createFeatureCategories = async (req, res) => {
 export const getAllFeaturedCategories = async (req, res) => {
 
     try {
-        
+
         const checkfeatureCat = await FeatureCategory.find({})
 
         if (checkfeatureCat.length > 0) {
@@ -56,3 +60,34 @@ export const getAllFeaturedCategories = async (req, res) => {
         })
     }
 }
+
+
+
+export const updateFeatureCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+        const { featureCategoriesName } = req.body;
+
+        // Access files from req.files based on field names
+        const feature_category_logo = req.files['feature_category_logo'] ? req.files['feature_category_logo'][0].filename : null;
+        const feature_category_image = req.files['feature_category_image'] ? req.files['feature_category_image'][0].filename : null;
+
+        // Update the feature category in the database
+        const checkCategory = await FeatureCategory.findOneAndUpdate(
+            { _id: categoryId },
+            { featureCategoriesName, feature_category_logo, feature_category_image },
+            { new: true }
+        );
+
+        // Send response
+        res.status(200).json({
+            message: "Feature category updated successfully",
+            category: checkCategory
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};

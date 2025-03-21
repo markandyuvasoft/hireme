@@ -13,7 +13,7 @@ export const createBlog = async (req, res) => {
 
         if (checkBlog) {
             return res.status(400).json({
-                message: "already have this blog"
+                message: "already have this blog" 
             })
         }
 
@@ -65,7 +65,7 @@ export const get_single_blog = async (req, res) => {
 export const getAll_Blog = async (req, res) => {
 
     try {
-        const checkDetails = await Blog.find({})
+        const checkDetails = await Blog.find({}).sort({sort : 1}).sort({ createdAt: -1 })
 
         if (checkDetails.length > 0) {
             res.status(200).json({

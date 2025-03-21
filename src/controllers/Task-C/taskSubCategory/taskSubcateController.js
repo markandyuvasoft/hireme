@@ -1,0 +1,387 @@
+import Auth from "../../../models/Auth-M/authModel.js";
+import TaskSubcategory from "../../../models/Task-M/Task-subcategory/task-subcategory-schema.js";
+
+
+// create task
+export const createTaskSubCategory = async (req, res) => {
+
+    try {
+        const { authId } = req.params
+
+        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location } = req.body
+
+        const task_logo = req.file ? req.file.filename : null
+
+        const checkAuth = await Auth.findOne({ _id: authId })
+
+        if (!checkAuth) {
+            return res.status(400).json({
+                message: "firstly you register"
+            })
+        }
+
+        const checkTask = await TaskSubcategory.findOne({ taskTitle })
+
+        if (checkTask) {
+            return res.status(400).json({
+                message: "already have this task"
+            })
+        }
+
+        const newTask = new TaskSubcategory({
+            authId, taskCategoryId, taskTitle, taskDescription, task_logo, taskVerify, task_Skill_Required, tags, taskType, location
+        })
+
+        await newTask.save()
+
+        res.status(200).json({
+            message: "task created successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error",
+            error: error
+        })
+    }
+}
+
+
+
+// all task get
+export const getAllTask = async (req, res) => {
+
+    try {
+        const checkTask = await TaskSubcategory.find({}).populate({
+            path: "authId",
+            select: "firstName"
+        })
+            .populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            })
+
+        if (checkTask.length > 0) {
+            res.status(200).json({
+                message: "all task are",
+                popularTask: checkTask
+            })
+        }
+
+        else {
+            res.status(404).json({
+                message: "not found any task"
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+}
+
+
+
+// category according get task
+export const category_according_task = async (req, res) => {
+
+    try {
+        const { taskCategoryId } = req.params
+
+        const checkTask = await TaskSubcategory.find({ taskCategoryId }).populate({
+            path: "authId",
+            select: "firstName"
+        })
+            .populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            })
+
+        if (checkTask) {
+            res.status(200).json({
+                message: "category according task",
+                task_category_basis: checkTask
+            })
+        }
+
+        else {
+            res.status(404).json({
+                message: "not found task in this category"
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+}
+
+
+// user according task get
+
+export const auth_according_task = async (req, res) => {
+
+    try {
+        const { authId } = req.params
+
+        const checkTask = await TaskSubcategory.find({ authId }).populate({
+            path: "authId",
+            select: "firstName"
+        })
+            .populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            })
+
+
+        if (checkTask) {
+            res.status(200).json({
+                message: "your created task",
+                yourCreatedTask: checkTask
+            })
+        }
+
+        else {
+            res.status(404).json({
+                message: "not found task"
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+}
+
+
+// search task
+export const searchTasks = async (req, res) => {
+
+    try {
+        const { taskTitle, task_Skill_Required, tags, taskType, location } = req.query;
+
+        let searchFilter = {};
+
+        if (taskTitle) {
+            searchFilter.taskTitle = { $regex: taskTitle, $options: 'i' };
+        }
+
+        if (task_Skill_Required) {
+            searchFilter.task_Skill_Required = { $in: task_Skill_Required.split(",") };
+        }
+
+        if (tags) {
+            searchFilter.tags = { $regex: tags, $options: 'i' };
+        }
+
+        if (taskType) {
+            searchFilter.taskType = taskType;
+        }
+
+        if (location) {
+            searchFilter.location = { $regex: location, $options: 'i' };
+        }
+
+        const tasks = await TaskSubcategory.find(searchFilter)
+            .populate({
+                path: "authId",
+                select: "firstName"
+            })
+            .populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            });
+
+        if (tasks.length > 0) {
+            res.status(200).json({
+                message: "Tasks found based on search criteria",
+                tasks: tasks
+            });
+        } else {
+            res.status(404).json({
+                message: "No tasks found for the given search criteria"
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
+
+
+// get the single task
+export const found_single_task = async (req, res) => {
+
+    try {
+
+        const { taskId } = req.params
+
+        const checkTask = await TaskSubcategory.findOne({ _id: taskId }).populate({
+            path: "authId",
+            select: "firstName"
+        })
+            .populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            })
+
+
+        if (checkTask) {
+            res.status(200).json({
+                message: "single task",
+                singleTask: checkTask
+            })
+        }
+        else {
+            res.status(404).json({
+                message: "not found this task"
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+}
+
+
+// update a task
+export const updateTask = async (req, res) => {
+
+    try {
+        const { taskId } = req.params
+
+        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location } = req.body
+
+        const task_logo = req.file ? req.file.filename : null
+
+
+        const checkTask = await TaskSubcategory.findByIdAndUpdate({ _id: taskId }, {
+            taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location, task_logo
+
+        }, { new: true })
+
+        if (checkTask) {
+            res.status(200).json({
+                message: "update this task"
+            })
+        }
+        else {
+            res.status(404).json({
+                message: "not found this task"
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+
+}
+
+
+// delete task
+export const deleteTask = async (req, res) => {
+
+    try {
+
+        const { taskId } = req.params
+
+        const checkTask = await TaskSubcategory.findOneAndDelete({ _id: taskId })
+
+        if (checkTask) {
+            res.status(200).json({
+                message: "delete task"
+            })
+        }
+        else {
+            res.status(404).json({
+                message: "not found this task"
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+    }
+}
+
+
+
+// review and rate by task
+
+export const review_and_rating_task = async (req, res) => {
+
+    try {
+
+        const { userId, taskId } = req.params;
+        const { rating, review } = req.body;
+
+        const task = await TaskSubcategory.findOne({ _id: taskId });
+
+        if (!task) {
+            return res.status(400).json({
+                message: "task not found"
+            });
+        }
+
+        // check alrady rating and review in same user
+        const existingRating = task.ratings.find(r => r.reviewerId.toString() === userId);
+
+        if (existingRating) {
+            existingRating.rating = rating;
+            existingRating.review = review;
+            existingRating.createdAt = new Date()
+
+        } else {
+            task.ratings.push({ rating, review, reviewerId: userId });
+        }
+
+        await task.save();
+
+        res.status(200).json({
+            message: "successfully added or updated",
+            task
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error",
+            error: error.message
+        })
+    }
+}
+
+
+
+export const popular_review_rating_task = async (req, res) => {
+
+    try {
+        const task = await TaskSubcategory.find({}).populate('ratings.reviewerId', 'firstName')
+
+        const taskWithAverageRating = task.map(task => {
+
+            let totalStars = 0;
+            task.ratings.forEach(rating => {
+                totalStars += rating.rating;
+            });
+
+            const averageRating = task.ratings.length > 0 ? totalStars / task.ratings.length : 0;
+
+            return {
+                ...task.toObject(),
+                averageRating
+            };
+        })
+
+        taskWithAverageRating.sort((a, b) => b.averageRating - a.averageRating);
+
+        res.status(200).send({ task: taskWithAverageRating });
+
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};

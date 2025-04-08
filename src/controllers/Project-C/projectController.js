@@ -5,61 +5,13 @@ import Project from "../../models/Project-M/projectSchema.js";
 import Service from "../../models/Service-M/serviceSchema.js";
 
 
-// create project quote
-
-export const createProject = async (req, res) => {
-
-    try {
-
-        const { authId } = req.params
-
-        const { serviceId } = req.params
-
-        const { order_quotes, dead_line, status } = req.body
-
-        const checkService = await Service.findOne({ _id: serviceId })
-
-        if (!checkService) {
-            return res.status(404).json({
-                message: "not found this service"
-            })
-        }
-
-        const checkQuote = await Project.findOne({ order_quotes })
-
-        if (checkQuote) {
-            return res.status(400).json({
-                message: "same as old quote"
-            })
-        }
-
-        const newProject = new Project({
-            order_quotes, serviceId, authId, dead_line, status
-        })
-
-        await newProject.save()
-
-        res.status(200).json({
-            message: "new project is created",
-        })
-
-    } catch (error) {
-        res.status(500).json({
-            message: "internal server error"
-        })
-    }
-}
-
-
-
 // get the single service quote use serviceId
-
 export const found_service_quote = async (req, res) => {
 
     try {
-        const { serviceId } = req.params
+        const { projectId } = req.params
 
-        const checkService = await Project.findOne({ serviceId })
+        const checkService = await Project.findOne({ _id: projectId })
             .populate({
                 path: "serviceId",
                 select: "serviceImage title Basic_price.b_price authId"
@@ -78,7 +30,7 @@ export const found_service_quote = async (req, res) => {
             })
 
         if (checkService) {
-            checkService.messages = checkService.messages.filter(msg => msg.message); 
+            checkService.messages = checkService.messages.filter(msg => msg.message);
             res.status(200).json({
                 message: "this is your service quote",
                 service_quote: checkService
@@ -98,9 +50,7 @@ export const found_service_quote = async (req, res) => {
 }
 
 
-
 // update messages and files on project quote
-
 export const updateServiceQuote = async (req, res) => {
 
     try {
@@ -155,7 +105,6 @@ export const updateServiceQuote = async (req, res) => {
 
 
 // delete quote message on message id and auth id
-
 export const deleteQuoteMessages = async (req, res) => {
 
     try {
@@ -195,7 +144,6 @@ export const deleteQuoteMessages = async (req, res) => {
 }
 
 // delete quote file on file id and auth id
-
 export const deleteUplodedFiles = async (req, res) => {
 
     try {
@@ -236,8 +184,103 @@ export const deleteUplodedFiles = async (req, res) => {
 }
 
 
+export const fetchDeshboardDetails = async (req, res) => {
 
-// all found projects 
+    try {
+
+        const { authId } = req.params
+
+        const checkAuth = await Auth.findOne({ _id: authId })
+
+        if (!checkAuth) {
+            return res.status(404).json({
+                message: "not found auth profile"
+            })
+        }
+
+        const project_details = (await Project.find({ authId })).length
+
+        const check_draft_service = (await Draft.find({ authId })).length
+
+        const check_public_service = (await Service.find({ authId })).length
+
+        const totalServices = check_draft_service + check_public_service;
+
+        const deposits = await Deposit.find({ authId });
+
+        // Calculate total deposit amount
+        const totalDepositAmount = deposits.reduce((total, deposit) => total + deposit.USDTotalAmount, 0);
+
+
+        if (project_details.length > 0 || totalServices > 0) {
+
+            res.status(200).json({
+                message: "deshboard details",
+                totalProjects: project_details,
+                totalServices: totalServices,
+                totalDepositAmount: totalDepositAmount,
+            })
+        }
+
+        else {
+            res.status(404).json({
+                message: "not found details"
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+
+export const createProject = async (req, res) => {
+
+    try {
+        const { authId, serviceId } = req.params;
+
+        const { order_quotes, dead_line, status } = req.body;
+
+        // Check if the service exists
+        const checkService = await Service.findById(serviceId);
+
+        if (!checkService) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+
+        // Check if the same order quote already exists
+        const checkQuote = await Project.findOne({ order_quotes, serviceId });
+
+        if (checkQuote) {
+            return res.status(400).json({ message: "This order quote already exists" });
+        }
+
+        // Create a new project
+        const newProject = new Project({
+            order_quotes,
+            serviceId,
+            authId,
+            dead_line,
+            status,
+            serviceAuthId: checkService.authId, // Owner of the service
+        });
+
+        await newProject.save();
+
+        res.status(200).json({
+            message: "New project created successfully",
+            newProject,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
+
+
+
 
 export const found_allProjects = async (req, res) => {
 
@@ -252,8 +295,8 @@ export const found_allProjects = async (req, res) => {
             })
         }
 
-        const allProjects = await Project.find({authId}).select("-messages -uploadfiles -authId")
-
+        const allProjects = await Project.find({ authId }).select("-messages -uploadfiles -authId")
+            .sort({ createdAt: -1 })
             .populate({
                 path: "serviceId",
                 select: "title",
@@ -284,52 +327,49 @@ export const found_allProjects = async (req, res) => {
     }
 }
 
+// Get quotes received by a service owner
+export const getReceivedQuotes = async (req, res) => {
+    try {
+        const { authId } = req.params;
 
-// desplay on deshboard details
+        const receivedQuotes = await Project.find({ serviceAuthId: authId })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: "serviceId",
+                select: "title",
+                //alg table se populate krne ke ley like service se meko authId chy tha
+                populate: {
+                    path: "authId",
+                    select: "firstName"
+                }
+            })
 
-export const fetchDeshboardDetails = async (req, res) => {
+        res.status(200).json(receivedQuotes);
+
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+};
+
+
+export const updateProject = async (req, res) => {
 
     try {
+        const { projectId } = req.params
 
-        const { authId } = req.params
+        const { dead_line, status } = req.body;
 
-        const checkAuth = await Auth.findOne({ _id: authId })
+        const updateProject = await Project.findOneAndUpdate({ _id: projectId }, {
+            dead_line, status
 
-        if (!checkAuth) {
-            return res.status(404).json({
-                message: "not found auth profile"
-            })
-        }
-
-        const project_details = (await Project.find({authId})).length
-
-        const check_draft_service = (await Draft.find({ authId })).length
-
-        const check_public_service =  (await Service.find({ authId })).length
-
-        const totalServices = check_draft_service + check_public_service; 
-
-        const deposits = await Deposit.find({ authId });
-
-        // Calculate total deposit amount
-        const totalDepositAmount = deposits.reduce((total, deposit) => total + deposit.USDTotalAmount, 0);
+        }, { new: true })
 
 
-        if (project_details.length > 0 || totalServices > 0) {
+        res.status(200).send(updateProject)
 
-            res.status(200).json({
-                message: "deshboard details",
-                totalProjects: project_details,
-                totalServices: totalServices,
-                totalDepositAmount: totalDepositAmount,
-            })
-        }
-
-        else {
-            res.status(404).json({
-                message: "not found details"
-            })
-        }
 
     } catch (error) {
         res.status(500).json({

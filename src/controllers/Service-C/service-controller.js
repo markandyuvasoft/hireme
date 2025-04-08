@@ -10,7 +10,11 @@ export const createService = async (req, res) => {
 
         const { sub_categoryId, title, description, categoryId, about_Gig, requirement, searchTags, in_publish, FAQ, Basic_price, Standard_price, Premium_price } = req.body
 
-        const serviceImage = req.files.map(({ filename }) => `${filename}`)
+        // const serviceImage = req.files.map(({ filename }) => `${filename}`) 
+
+        const serviceImage = req.files && req.files.length > 0
+            ? req.files.map(({ filename }) => filename)
+            : [];
 
 
         const checkService = await Service.findOne({ title })
@@ -87,12 +91,12 @@ export const getSingleService = async (req, res) => {
 
         // Calculate average rating for the service
         let totalStars = 0;
-        let totalRatings = checkService.ratings.length;
-        let totalReview = checkService.ratings.filter(rating => rating.review).length;
+        let totalRatings = checkService?.ratings?.length;
+        let totalReview = checkService?.ratings?.filter(rating => rating.review).length;
 
 
 
-        checkService.ratings.forEach(rating => {
+        checkService?.ratings?.forEach(rating => {
             totalStars += rating.rating;
         });
 
@@ -101,7 +105,7 @@ export const getSingleService = async (req, res) => {
 
         //calculate avg rating
         const serviceWithRating = {
-            ...checkService.toObject(),
+            ...checkService?.toObject(),
             averageRating,
             totalRatings: totalStars,
             totalReview
@@ -121,7 +125,7 @@ export const getSingleService = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error
         })
     }
 }
@@ -521,7 +525,7 @@ export const popular_review_rating = async (req, res) => {
 
         // search ke ley 
         if (title) {
-            services = services.filter(service => service.title && service.title.toLowerCase().includes(title.toLowerCase()));
+            services = services.filter(service => service.title && service.title.toLowerCase().includes(title.toLowerCase()))
         }
 
         let filteredServices = [];
@@ -789,7 +793,9 @@ export const update_services = async (req, res) => {
         const { sub_categoryId, title, description, categoryId, about_Gig, requirement, searchTags, in_publish, FAQ, Basic_price, Standard_price, Premium_price } = req.body
 
 
-        const serviceImage = req.files.map(({ filename }) => `${filename}`)
+        const serviceImage = req.files && req.files.length > 0
+        ? req.files.map(({ filename }) => filename)
+        : []; 
 
 
         const checkService = await Service.findOne({ _id: serviceId })
@@ -835,7 +841,7 @@ export const get_service_draft_According = async (req, res) => {
         }
         else {
             res.status(404).json({
-                message : "not found any services"
+                message: "not found any services"
             })
         }
 
@@ -924,7 +930,9 @@ export const update_services_draft = async (req, res) => {
 
         const { sub_categoryId, title, description, categoryId, about_Gig, requirement, searchTags, in_publish } = req.body;
 
-        const serviceImage = req.files.map(({ filename }) => `${filename}`);
+        // const serviceImage =  req.files && req.files.length > 0
+        // ? req.files.map(({ filename }) => filename)
+        // : [];
 
         const Basic_price = JSON.parse(req.body.Basic_price);
         const Standard_price = JSON.parse(req.body.Standard_price);
@@ -938,6 +946,10 @@ export const update_services_draft = async (req, res) => {
             return res.status(404).json({
                 message: "Not found service draft"
             });
+        }
+        let serviceImage = checkService.serviceImage; // existing images
+        if (req.files && req.files.length > 0) {
+            serviceImage = req.files.map(({ filename }) => filename);
         }
 
         const updatedDraft = await Draft.findOneAndUpdate(
@@ -1036,14 +1048,17 @@ export const get_service_draft_According_all = async (req, res) => {
     try {
         const { authId } = req.params
 
-        const userDetails = await Draft.find({ authId }).sort({ createdAt: -1 })
+        const userDetails = await Draft.find({ authId }).sort({ createdAt: -1 }).populate({
+            path: "categoryId",
+            select: "featureCategoriesName"
+        })
 
         if (userDetails) {
             res.send(userDetails)
         }
         else {
             res.status(404).json({
-                message : "not found any services"
+                message: "not found any services"
             })
         }
 

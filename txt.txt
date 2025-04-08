@@ -267,3 +267,300 @@ export const perticular_sub_cat_service = async (req, res) => {
         })
     }
 }
+
+
+
+--------
+
+
+// export const createProject = async (req, res) => {
+
+//     try {
+
+//         const { authId } = req.params
+
+//         const { serviceId } = req.params
+
+//         const {serviceAuthId} = req.params
+
+//         const { order_quotes, dead_line, status } = req.body
+
+//         const checkService = await Service.findOne({ _id: serviceId })
+
+//         if (!checkService) {
+//             return res.status(404).json({
+//                 message: "not found this service"
+//             })
+//         }
+
+//         const checkQuote = await Project.findOne({ order_quotes })
+
+//         if (checkQuote) {
+//             return res.status(400).json({
+//                 message: "same as old quote"
+//             })
+//         }
+
+//         const newProject = new Project({
+//             order_quotes, serviceId, authId, dead_line, status, serviceAuthId
+//         })
+
+//         await newProject.save()
+
+//         res.status(200).json({
+//             message: "new project is created",
+//             newProject
+
+//         })
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "internal server error"
+//         })
+//     }
+// }
+------------------------
+
+
+
+export const found_allProjects = async (req, res) => {
+
+    try {
+        const { authId } = req.params
+
+        const checkAuth = await Project.find({ authId })
+
+        if (!checkAuth) {
+            return res.status(404).json({
+                message: "not found this auth profile"
+            })
+        }
+
+        const allProjects = await Project.find({authId}).select("-messages -uploadfiles -authId")
+
+            .populate({
+                path: "serviceId",
+                select: "title",
+                //alg table se populate krne ke ley like service se meko authId chy tha
+                populate: {
+                    path: "authId",
+                    select: "firstName"
+                }
+            })
+
+        if (allProjects.length > 0) {
+            res.status(200).json({
+                message: "all found projects",
+                allProjects: allProjects
+            })
+        }
+
+        else {
+            res.status(404).json({
+                message: "not found any projects"
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+
+
+
+
+
+// export const createProject = async (req, res) => {
+//     try {
+//         const { authId, serviceId } = req.params;
+//         const { order_quotes, dead_line, status } = req.body;
+
+//         // Check if the service exists
+//         const service = await Service.findById(serviceId);
+//         if (!service) {
+//             return res.status(404).json({ message: "Service not found" });
+//         }
+
+//         // Check if a quote already exists
+//         const existingQuote = await Project.findOne({ order_quotes, serviceId });
+//         if (existingQuote) {
+//             return res.status(400).json({ message: "This order quote already exists" });
+//         }
+
+//         // Create a new quote
+//         const newProject = new Project({
+//             order_quotes,
+//             serviceId,
+//             authId,
+//             dead_line,
+//             status,
+//             serviceAuthId: service.authId, // Owner of the service
+//         });
+
+//         await newProject.save();
+
+//         res.status(200).json({
+//             message: "Quote sent successfully",
+//             newProject,
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: "Internal server error", error: error.message });
+//     }
+// };
+
+
+
+
+// // Get quotes sent by a user
+// export const getSentQuotes = async (req, res) => {
+//     try {
+//         const { authId } = req.params;
+//         const sentQuotes = await Project.find({ authId }).populate("serviceId");
+//         res.status(200).json(sentQuotes);
+//     } catch (error) {
+//         res.status(500).json({ message: "Internal server error", error: error.message });
+//     }
+// };
+
+
+
+// export const found_allProjects = async (req, res) => {
+
+//     try {
+//         const { authId } = req.params
+
+//         const checkAuth = await Project.find({ authId })
+
+//         if (!checkAuth) {
+//             return res.status(404).json({
+//                 message: "not found this auth profile"
+//             })
+//         }
+
+//         const allProjects = await Project.find({authId}).select("-messages -uploadfiles -authId")
+
+//             .populate({
+//                 path: "serviceId",
+//                 select: "title",
+//                 //alg table se populate krne ke ley like service se meko authId chy tha
+//                 populate: {
+//                     path: "authId",
+//                     select: "firstName"
+//                 }
+//             })
+
+//         if (allProjects.length > 0) {
+//             res.status(200).json({
+//                 message: "all found projects",
+//                 allProjects: allProjects
+//             })
+//         }
+
+//         else {
+//             res.status(404).json({
+//                 message: "not found any projects"
+//             })
+//         }
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Internal server error"
+//         })
+//     }
+// }
+
+
+
+// export const found_allProjects_again = async (req, res) => {
+
+//     try {
+
+//         const { serviceId, ownerId } = req.params;
+
+//         // Check if the service exists and belongs to the owner
+//         const checkService = await Service.findOne({ _id: serviceId, authId: ownerId });
+        
+//         if (!checkService) {
+//             return res.status(404).json({ message: "Service not found or unauthorized access" });
+//         }
+
+//         // Get all order quotes for this service
+//         const orders = await Project.find({ serviceId }).populate("authId", "name email")
+//            .populate({
+//             path: "serviceId",
+//             select: "title",
+//             //alg table se populate krne ke ley like service se meko authId chy tha
+//             populate: {
+//                 path: "authId",
+//                 select: "firstName"
+//             }
+//         })
+
+//         res.status(200).json({
+//             message: "Orders retrieved successfully",
+//             allProjects: orders,
+        
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: "Internal server error", error: error.message });
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+// create project quote
+
+
+
+// export const createProject = async (req, res) => {
+    
+//     try {
+//         const { authId, serviceId } = req.params;
+
+//         const { order_quotes, dead_line, status } = req.body;
+
+//         // Check if the service exists
+//         const checkService = await Service.findById(serviceId);
+
+//         if (!checkService) {
+//             return res.status(404).json({ message: "Service not found" });
+//         }
+
+//         // Check if the same order quote already exists
+//         const checkQuote = await Project.findOne({ order_quotes, serviceId });
+
+//         if (checkQuote) {
+//             return res.status(400).json({ message: "This order quote already exists" });
+//         }
+
+//         // Create a new project
+//         const newProject = new Project({
+//             order_quotes,
+//             serviceId,
+//             authId,
+//             dead_line,
+//             status,
+//             serviceAuthId: checkService.authId, // Owner of the service
+//         });
+
+//         await newProject.save();
+
+//         res.status(200).json({
+//             message: "New project created successfully",
+//             newProject,
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: "Internal server error", error: error.message });
+//     }
+// };

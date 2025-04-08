@@ -8,7 +8,7 @@ export const createTaskSubCategory = async (req, res) => {
     try {
         const { authId } = req.params
 
-        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location } = req.body
+        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, location, Task_Max_Budget, Task_Min_Budget, fixed_Task_type } = req.body
 
         const task_logo = req.file ? req.file.filename : null
 
@@ -24,18 +24,19 @@ export const createTaskSubCategory = async (req, res) => {
 
         if (checkTask) {
             return res.status(400).json({
-                message: "already have this task"
+                message: "already have this task",
             })
         }
 
         const newTask = new TaskSubcategory({
-            authId, taskCategoryId, taskTitle, taskDescription, task_logo, taskVerify, task_Skill_Required, tags, taskType, location
+            authId, taskCategoryId, taskTitle, taskDescription, task_logo, taskVerify, task_Skill_Required, location, Task_Max_Budget, Task_Min_Budget, fixed_Task_type
         })
 
         await newTask.save()
 
         res.status(200).json({
-            message: "task created successfully"
+            message: "task created successfully",
+            newTask : newTask
         })
     } catch (error) {
         res.status(500).json({
@@ -90,7 +91,7 @@ export const category_according_task = async (req, res) => {
 
         const checkTask = await TaskSubcategory.find({ taskCategoryId }).populate({
             path: "authId",
-            select: "firstName"
+            select: "firstName" 
         })
             .populate({
                 path: "taskCategoryId",
@@ -158,7 +159,7 @@ export const auth_according_task = async (req, res) => {
 export const searchTasks = async (req, res) => {
 
     try {
-        const { taskTitle, task_Skill_Required, tags, taskType, location } = req.query;
+        const { taskTitle, task_Skill_Required, location, newest, oldest } = req.query;
 
         let searchFilter = {};
 
@@ -170,19 +171,26 @@ export const searchTasks = async (req, res) => {
             searchFilter.task_Skill_Required = { $in: task_Skill_Required.split(",") };
         }
 
-        if (tags) {
-            searchFilter.tags = { $regex: tags, $options: 'i' };
-        }
-
-        if (taskType) {
-            searchFilter.taskType = taskType;
-        }
-
         if (location) {
             searchFilter.location = { $regex: location, $options: 'i' };
         }
 
+        let sortOption = {};
+
+        if (newest === "newest") {
+            sortOption = { createdAt: -1 };
+
+        } else if (oldest === "oldest") {
+            sortOption = { createdAt: 1 };
+
+        } else {
+            sortOption = {};
+        }
+
+
         const tasks = await TaskSubcategory.find(searchFilter)
+
+            .sort(sortOption)
             .populate({
                 path: "authId",
                 select: "firstName"
@@ -204,10 +212,13 @@ export const searchTasks = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: "Internal server error"
+            message: error.message
         });
     }
 };
+
+
+
 
 
 
@@ -227,11 +238,19 @@ export const found_single_task = async (req, res) => {
                 select: "task_category_title"
             })
 
-
         if (checkTask) {
+
+            // average rating calculate karne ke ley
+            let averageRating = 0;
+            if (checkTask.ratings && checkTask.ratings.length > 0) {
+                const totalRating = checkTask.ratings.reduce((sum, rating) => sum + rating.rating, 0);
+                averageRating = totalRating / checkTask.ratings.length;
+            }
+
             res.status(200).json({
                 message: "single task",
-                singleTask: checkTask
+                singleTask: checkTask,
+                averageRating
             })
         }
         else {
@@ -253,13 +272,21 @@ export const updateTask = async (req, res) => {
     try {
         const { taskId } = req.params
 
-        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location } = req.body
+        const { taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, location, Task_Max_Budget, Task_Min_Budget, fixed_Task_type } = req.body
 
-        const task_logo = req.file ? req.file.filename : null
+
+        const existingTask = await TaskSubcategory.findById(taskId)
+
+        if (!existingTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        const task_logo = req.file ? req.file.filename : existingTask.task_logo;
 
 
         const checkTask = await TaskSubcategory.findByIdAndUpdate({ _id: taskId }, {
-            taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, tags, taskType, location, task_logo
+
+            taskCategoryId, taskTitle, taskDescription, taskVerify, task_Skill_Required, location, Task_Max_Budget, Task_Min_Budget, fixed_Task_type, task_logo
 
         }, { new: true })
 
@@ -275,7 +302,7 @@ export const updateTask = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: "internal server error"
+            message: error.message
         })
     }
 

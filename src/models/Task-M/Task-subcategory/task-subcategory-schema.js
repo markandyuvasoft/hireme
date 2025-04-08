@@ -33,14 +33,7 @@ const taskSubCategorySchema = new mongoose.Schema({
         type: String
     }],
 
-    tags: {
-        type: String
-    },
 
-    taskType: {
-        type: String,
-        enum: ['Freelance', 'Full Time', 'Part Time', 'Internship', 'Temporary']
-    },
 
     location: {
         type: String
@@ -65,7 +58,21 @@ const taskSubCategorySchema = new mongoose.Schema({
                 default: Date.now
             }
         }
-    ]
+    ],
+
+    Task_Max_Budget: {
+        type: Number
+    },
+
+    Task_Min_Budget: {
+        type: Number
+    },
+
+    fixed_Task_type: {
+        type: String,
+        default: "Fixed Price Project",
+        enum: ["Fixed Price Project", "Hourly Project"]
+    }
 
 }, { timestamps: true })
 

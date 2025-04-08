@@ -90,33 +90,23 @@ const draftSchema = new mongoose.Schema({
             },
 
             b_vector_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             b_printable_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             b_mockup: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             b_source_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             b_social_media_kit: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             b_number_of_concept: {
@@ -146,33 +136,23 @@ const draftSchema = new mongoose.Schema({
             },
 
             s_vector_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             s_printable_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             s_mockup: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             s_source_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             s_social_media_kit: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             s_number_of_concept: {
@@ -202,33 +182,23 @@ const draftSchema = new mongoose.Schema({
             },
 
             p_vector_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             p_printable_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             p_mockup: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             p_source_file: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             p_social_media_kit: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                type: String
             },
 
             p_number_of_concept: {

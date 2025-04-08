@@ -12,7 +12,7 @@ serviceRouter.get("/subcategory-service/:sub_categoryId", perticular_sub_cat_ser
 
 serviceRouter.get("/services-category/:categoryId", service_category_according)
 
-serviceRouter.post("/searchService", search_service_by_title)
+serviceRouter.get("/searchService", search_service_by_title)
 
 serviceRouter.get("/auth-service/:authId", get_service_user_According)
 

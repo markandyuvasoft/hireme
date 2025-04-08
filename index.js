@@ -10,11 +10,11 @@ import serviceRouter from "./src/routes/Service-R/service-router.js";
 import taskCategoryRouter from "./src/routes/Task-R/task-category/task-category-router.js";
 import taskSubcategoryRouter from "./src/routes/Task-R/Task-subCategory/task-subcategoryrouter.js";
 import portfolioRouter from "./src/routes/Portfolio-R/portfolioRouter.js";
-
-import cors from "cors"; 
-import morgan from "morgan"; 
+import bidRouter from "./src/routes/Bid-Task-R/bidTaskRouter.js";
 import projectRouter from "./src/routes/Project-R/projectRouter.js";
 import depositRouter from "./src/routes/Deposit-R/depositRouter.js";
+import cors from "cors"; 
+import morgan from "morgan"; 
 
 
 dotenv.config();
@@ -39,17 +39,18 @@ app.use("/api/v1", taskSubcategoryRouter)
 app.use("/api/v1", portfolioRouter)
 app.use("/api/v1", projectRouter)
 app.use("/api/v1", depositRouter)
+app.use("/api/v1", bidRouter)
 
 
 app.use("/", express.static("public/upload"));
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
   console.log(`Server is running on http://0.0.0.0:${port}`);
 });
 
-process.on("SIGINT", () => {
-  console.log("Server is shutting down...");
-  process.exit();
-});
+// process.on("SIGINT", () => {
+//   console.log("Server is shutting down...");
+//   process.exit();
+// });

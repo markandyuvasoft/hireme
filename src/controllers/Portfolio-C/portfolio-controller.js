@@ -47,7 +47,7 @@ export const AuthPortfolioFound = async (req, res) => {
             select: "firstName lastName authProfile"
         })
 
-        const checkAuth = await Portfolio.find({ authId })
+        const checkAuth = await Portfolio.find({ authId }).sort({createdAt : -1})
 
         if (!checkAuth) {
             return res.status(404).json({

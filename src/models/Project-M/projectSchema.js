@@ -17,6 +17,11 @@ const projectSchema = new mongoose.Schema({
         ref: "Auth"
     },
 
+    serviceAuthId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Auth"
+    },
+
     messages: [
         {
 

@@ -38,14 +38,14 @@ export const addDeposit = async (req, res) => {
                         name: "MetaLance Wallet Deposit",
                         description: `IN: ₹${totalAmountINR.toLocaleString()} | US: $${totalAmountUSD}\n(1 USD = ₹${INR_TO_USD})`
                     },
-                    unit_amount: Math.round(totalAmountUSD * 100), 
+                    unit_amount: Math.round(totalAmountUSD * 100),
                 },
                 quantity: 1,
             }],
             mode: "payment",
             success_url: `https://yourwebsite.com/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `https://yourwebsite.com/cancel`,
-            
+
             metadata: {
                 authId,
                 status,
@@ -58,10 +58,10 @@ export const addDeposit = async (req, res) => {
 
         const newDeposit = new Deposit({
             authId,
-            depositAmountUSD: depositAmountUSD, 
-            process_charge: processChargeUSD, 
+            depositAmountUSD: depositAmountUSD,
+            process_charge: processChargeUSD,
             USDTotalAmount: totalAmountUSD,
-            IndianTotalAmout : totalAmountINR,
+            IndianTotalAmout: totalAmountINR,
             status: "pending",
             stripeSessionId: session.id,
         });
@@ -93,19 +93,19 @@ export const manageStatus = async (req, res) => {
             return res.status(404).json({ message: "Session not found" });
         }
 
-        let newStatus = "pending"; 
+        let newStatus = "pending";
 
         if (session.payment_status === "paid") {
             newStatus = "success";
-        
+
         } else if (session.payment_status === "canceled") {
             newStatus = "canceled";
-        
+
         } else if (session.payment_status === "failed") {
             newStatus = "failed";
-        
+
         } else {
-            newStatus = "canceled"; 
+            newStatus = "canceled";
         }
 
         const updatedDeposit = await Deposit.findOneAndUpdate(

@@ -15,7 +15,7 @@ export const temp = async (req, res) => {
 
         if (checkAuth) {
             return res.status(400).json({
-                message: "already have account"
+                message: "already have an account"
             })
         }
 
@@ -120,6 +120,7 @@ export const login = async (req, res) => {
             authId: checkEmail._id,
             firstName: checkEmail.firstName,
             lastName: checkEmail.lastName,
+            authProfile : checkEmail.authProfile,
             token
         })
 
@@ -263,7 +264,7 @@ export const getProfile = async (req, res) => {
     try {
         const { authId } = req.params
 
-        const checkAuth = await Auth.findOne({ _id: authId })
+        const checkAuth = await Auth.findOne({ _id: authId }).sort({createdAt : -1})
 
         if (checkAuth) {
             res.status(200).json({

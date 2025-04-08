@@ -92,44 +92,39 @@ const serviceSchema = new mongoose.Schema({
 
             b_vector_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             b_printable_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             b_mockup: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             b_source_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             b_social_media_kit: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             b_number_of_concept: {
-                type: String
+                type: Number
             },
 
             b_revisions: {
-                type: String
+                type: Number
             },
 
             b_price: {
-                type: String
+                type: Number
             }
 
         }
@@ -148,32 +143,27 @@ const serviceSchema = new mongoose.Schema({
 
             s_vector_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             s_printable_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             s_mockup: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             s_source_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             s_social_media_kit: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             s_number_of_concept: {
@@ -204,32 +194,27 @@ const serviceSchema = new mongoose.Schema({
 
             p_vector_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             p_printable_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             p_mockup: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             p_source_file: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             p_social_media_kit: {
                 type: String,
-                enum: ["yes", "no"],
-                default: "no"
+                
             },
 
             p_number_of_concept: {

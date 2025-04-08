@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "supervisor index.js"
+    "start": "nodemon --signal SIGUSR2 index.js"
   },
   "keywords": [],
   "author": "",

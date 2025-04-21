@@ -564,3 +564,156 @@ export const found_allProjects = async (req, res) => {
 //         res.status(500).json({ message: "Internal server error", error: error.message });
 //     }
 // };
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const deatils_On_Task_MileStone = async (req, res) => {
+//     try {
+//         const { taskId, loginAuthId } = req.params;
+//         const { session_id } = req.query; // session_id frontend se send hoga
+
+//         // Step 1: Retrieve session from Stripe
+//         let session;
+//         if (session_id) {
+//             session = await stripe.checkout.sessions.retrieve(session_id);
+//         }
+
+//         // Step 2: Update milestone if session is paid
+//         if (session && session.payment_status === "paid") {
+//             const milestoneId = session.metadata?.milestoneId;
+
+//             if (milestoneId) {
+//                 await MileStone.findByIdAndUpdate(milestoneId, {
+//                     mileStatus: "Paid",
+//                 });
+
+//                 await Deposit.findOneAndUpdate(
+//                     { session_id: session_id },
+//                     { status: "paid" }
+//                 );
+//             }
+//         }
+
+
+       
+        
+
+//         // Step 3: Fetch milestones
+//         const milestones = await MileStone.find({ taskId })
+//             .populate({
+//                 path: "taskId",
+//                 select: "taskTitle"
+//             })
+//             .populate({
+//                 path: "loginAuthId",
+//                 select: "firstName _id"
+//             })
+//             .populate({
+//                 path: "bidId",
+//                 select: "TaskCreaterId",
+//                 populate: {
+//                     path: "TaskCreaterId",
+//                     select: "firstName _id"
+//                 }
+//             });
+
+//         if (!milestones || milestones.length === 0) {
+//             return res.status(404).json({
+//                 message: "Milestone not found"
+//             });
+//         }
+
+//         const isAuthorized = milestones.some(milestone =>
+//             milestone.loginAuthId?._id.toString() === loginAuthId ||
+//             milestone.bidId?.TaskCreaterId?._id.toString() === loginAuthId
+//         );
+
+//         if (!isAuthorized) {
+//             return res.status(403).json({
+//                 message: "You are not authorized to view these milestones"
+//             });
+//         }
+
+//         res.status(200).json({
+//             message: "Found milestones",
+//             foundMileStone: milestones
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Internal server error",
+//             error: error.message
+//         });
+//     }
+// };
+
+
+
+
+
+
+
+
+
+// export const deatils_On_Task_MileStone = async (req, res) => {
+//     try {
+//         const { taskId, loginAuthId } = req.params;
+
+//         const milestones = await MileStone.find({ taskId })
+//             .populate({
+//                 path: "taskId",
+//                 select: "taskTitle"
+//             })
+//             .populate({
+//                 path: "loginAuthId",
+//                 select: "firstName _id"
+//             })
+//             .populate({
+//                 path: "bidId",
+//                 select: "TaskCreaterId",
+//                 populate: {
+//                     path: "TaskCreaterId",
+//                     select: "firstName _id"
+//                 }
+//             });
+
+//         if (!milestones || milestones.length === 0) {
+//             return res.status(404).json({
+//                 message: "Milestone not found"
+//             });
+//         }
+
+//         // Check authorization: user must be either the creator of the milestone or task owner
+//         const isAuthorized = milestones.some(milestone =>
+//             milestone.loginAuthId?._id.toString() === loginAuthId ||
+//             milestone.bidId?.TaskCreaterId?._id.toString() === loginAuthId
+//         );
+
+//         if (!isAuthorized) {
+//             return res.status(403).json({
+//                 message: "You are not authorized to view these milestones"
+//             });
+//         }
+
+//         res.status(200).json({
+//             message: "Found milestones",
+//             foundMileStone: milestones
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Internal server error",
+//             error: error.message
+//         });
+//     }
+// };

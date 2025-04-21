@@ -13,6 +13,7 @@ import portfolioRouter from "./src/routes/Portfolio-R/portfolioRouter.js";
 import bidRouter from "./src/routes/Bid-Task-R/bidTaskRouter.js";
 import projectRouter from "./src/routes/Project-R/projectRouter.js";
 import depositRouter from "./src/routes/Deposit-R/depositRouter.js";
+import mileStoneRouter from "./src/routes/MileStone-R/mileStoneRouter.js";
 import cors from "cors"; 
 import morgan from "morgan"; 
 
@@ -40,6 +41,8 @@ app.use("/api/v1", portfolioRouter)
 app.use("/api/v1", projectRouter)
 app.use("/api/v1", depositRouter)
 app.use("/api/v1", bidRouter)
+app.use("/api/v1", mileStoneRouter)
+
 
 
 app.use("/", express.static("public/upload"));

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const depositSchema = new mongoose.Schema({
 
-    authId: {
+    loginAuthId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Auth"
     },
@@ -15,23 +15,41 @@ const depositSchema = new mongoose.Schema({
         type: Number
     },
 
-    IndianTotalAmout : {
-        type : Number
+    IndianTotalAmout: {
+        type: Number
     },
 
     process_charge: {
         type: Number
     },
 
-    stripeSessionId: {
+    session_id: {
         type: String
     },
 
     status: {
         type: String,
-        enum: ["pending", "success", "cancle"],
         default: "pending"
+    },
+
+    milestoneId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MileStone"
+    },
+    taskId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TaskSubcategory"
+    },
+
+    mileCreatorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Auth"
+    },
+    bidUserId : {
+          type: mongoose.Schema.Types.ObjectId,
+        ref: "Auth"
     }
+
 
 }, { timestamps: true })
 

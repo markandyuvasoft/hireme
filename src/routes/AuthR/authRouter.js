@@ -1,6 +1,7 @@
 import express from "express"
 import { addEducation, changePassword, contactUs, deleteEduction, forgetPassword, getProfile, login, register, resent_otp, reset_password, temp, updateAuth, updateAuthImage, verifyOtp } from "../../controllers/Auth-C/authController.js"
 import { upload } from "../../common/image.js"
+import { saveDeviceToken } from "../../controllers/Bid-Task-C/bidtaskController.js"
 
 
 const authRouter = express.Router()
@@ -33,5 +34,8 @@ authRouter.delete("/deleteEducation/:authId/:educationId", deleteEduction)
 authRouter.post("/contactUs", contactUs)
 
 authRouter.patch("/updateAuthProfileImage/:authId",upload.single("authProfile"), updateAuthImage)
+
+
+authRouter.get("addtoken", saveDeviceToken)
 
 export default authRouter

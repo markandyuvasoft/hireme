@@ -19,6 +19,9 @@ export const temp = async (req, res) => {
             })
         }
 
+        console.log(checkAuth);
+        
+
         if (password != confirm_password) {
             return res.status(401).json({
                 message: "confirm_password are not matched"

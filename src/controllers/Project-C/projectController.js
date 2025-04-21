@@ -1,5 +1,6 @@
 import Auth from "../../models/Auth-M/authModel.js";
 import Deposit from "../../models/Deposit-M/depositSchema.js";
+import Wallet from "../../models/Deposit-M/walletSchema.js";
 import Draft from "../../models/Draft-M/draftSchema.js";
 import Project from "../../models/Project-M/projectSchema.js";
 import Service from "../../models/Service-M/serviceSchema.js";
@@ -118,7 +119,7 @@ export const deleteQuoteMessages = async (req, res) => {
             })
         }
 
-        const updateProject = await Project.findOneAndUpdate(
+        const updateProject = await Project.findOneAndUpdate( 
             { authId },
             { $pull: { messages: { _id: messageId } } },
             { new: true }
@@ -178,7 +179,7 @@ export const deleteUplodedFiles = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
-            message: "Internal server error"
+            message:error
         })
     }
 }
@@ -206,10 +207,10 @@ export const fetchDeshboardDetails = async (req, res) => {
 
         const totalServices = check_draft_service + check_public_service;
 
-        const deposits = await Deposit.find({ authId });
+        const deposits = await Wallet.find({loginAuthId : authId });
 
         // Calculate total deposit amount
-        const totalDepositAmount = deposits.reduce((total, deposit) => total + deposit.USDTotalAmount, 0);
+        const totalDepositAmount = deposits.reduce((total, deposit) => total + deposit.amountUSD, 0); 
 
 
         if (project_details.length > 0 || totalServices > 0) {
@@ -248,7 +249,7 @@ export const createProject = async (req, res) => {
         const checkService = await Service.findById(serviceId);
 
         if (!checkService) {
-            return res.status(404).json({ message: "Service not found" });
+            return res.status(401).json({ message: "Service not found" });
         }
 
         // Check if the same order quote already exists

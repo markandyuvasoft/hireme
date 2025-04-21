@@ -461,7 +461,7 @@ export const review_and_rating = async (req, res) => {
         const service = await Service.findOne({ _id: serviceId });
 
         if (!service) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "service not found"
             });
         }
@@ -795,7 +795,7 @@ export const update_services = async (req, res) => {
 
         const serviceImage = req.files && req.files.length > 0
         ? req.files.map(({ filename }) => filename)
-        : []; 
+        : [];   
 
 
         const checkService = await Service.findOne({ _id: serviceId })
@@ -930,9 +930,9 @@ export const update_services_draft = async (req, res) => {
 
         const { sub_categoryId, title, description, categoryId, about_Gig, requirement, searchTags, in_publish } = req.body;
 
-        // const serviceImage =  req.files && req.files.length > 0
-        // ? req.files.map(({ filename }) => filename)
-        // : [];
+        // const { sub_categoryId, title, description, categoryId, about_Gig, requirement, searchTags, in_publish, Basic_price, Standard_price, Premium_price,FAQ } = req.body;
+
+      
 
         const Basic_price = JSON.parse(req.body.Basic_price);
         const Standard_price = JSON.parse(req.body.Standard_price);
@@ -948,6 +948,7 @@ export const update_services_draft = async (req, res) => {
             });
         }
         let serviceImage = checkService.serviceImage; // existing images
+
         if (req.files && req.files.length > 0) {
             serviceImage = req.files.map(({ filename }) => filename);
         }

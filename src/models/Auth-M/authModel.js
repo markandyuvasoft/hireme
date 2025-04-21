@@ -79,6 +79,16 @@ const authSchema = new mongoose.Schema({
 
     otp : {
         type : Number
+    },
+
+    stripeAccountId : {
+        type : String
+    },
+
+    deviceToken: { type: String },
+
+    fcmToken : {
+        type : String
     }
 
 

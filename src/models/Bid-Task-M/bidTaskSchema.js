@@ -43,8 +43,10 @@ const bidTaskSchema = new mongoose.Schema({
     confirmation_bid_user : {
         type : String,
         default : "Cancle"
-    }
-
+    },
+    fcmToken: {
+        type: String,
+      },
 },{timestamps : true})
 
 

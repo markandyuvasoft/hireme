@@ -575,113 +575,113 @@ export const verifyStripePayment = async (req, res) => {
 
 
 
-// import paypal from '@paypal/checkout-server-sdk';
+import paypal from '@paypal/checkout-server-sdk';
 
-// const environment = new paypal.core.SandboxEnvironment(
-//     'ASJ0X7_FTDh9Jo9eRBS5n6Guec8NKdDOIrlBx3AnhizDIKzEnYHwxSqpzS5aIWEsSf5WtL6M6FlDN8kQ',
-//     'ECxL-GtSYgx6QBPC4tilEnSzjeGGcaQ-ryvkqMhGTu9tHnljyPdGZwnc2OJhc_JdNz2zAg3Lm9JuYaHU'
-// );
+const environment = new paypal.core.SandboxEnvironment(
+    'ASJ0X7_FTDh9Jo9eRBS5n6Guec8NKdDOIrlBx3AnhizDIKzEnYHwxSqpzS5aIWEsSf5WtL6M6FlDN8kQ',
+    'ECxL-GtSYgx6QBPC4tilEnSzjeGGcaQ-ryvkqMhGTu9tHnljyPdGZwnc2OJhc_JdNz2zAg3Lm9JuYaHU'
+);
 
-// const client = new paypal.core.PayPalHttpClient(environment);
-
-
-// export const creataddwalletFORPaypal = async (req, res) => {
-//     try {
-//         const { loginAuthId } = req.params;
-//         const { amountUSD } = req.body;
-
-//         const amount = parseFloat(amountUSD);
-//         if (isNaN(amount)) {
-//             return res.status(400).json({ message: "Invalid amountUSD" });
-//         }
-
-//         const processChargeUSD = (amount * 1) / 100;
-//         const totalAmountUSD = amount + processChargeUSD;
-
-//         const totalAmountINR = parseFloat((totalAmountUSD * INR_TO_USD).toFixed(2));
-
-//         // PayPal order creation
-//         const request = new paypal.orders.OrdersCreateRequest();
-//         request.prefer('return=representation');
-//         request.requestBody({
-//             intent: 'CAPTURE',
-//             purchase_units: [{
-//                 amount: {
-//                     currency_code: 'USD',
-//                     value: totalAmountUSD.toFixed(2)
-//                 },
-//                 description: `Payment for loginAuthId: ${loginAuthId}`,
-//                 custom_id: loginAuthId,
-//                 // Optionally add additional metadata for tracking
-//                 custom_id: `receipt_${Date.now()}`
-//             }]
-//         });
-
-//         // Call PayPal API to create the order
-//         const order = await client.execute(request);
-
-//         // Find the approval link
-//         const approvalUrl = order.result.links.find(link => link.rel === 'approve').href;
-
-//         // Return order details and PayPal approval URL
-//         res.json({
-//             success: true,
-//             order_id: order.result.id,
-//             amount: totalAmountUSD.toFixed(2),
-//             currency: 'USD',
-//             paypalApprovalUrl: approvalUrl, // PayPal approval URL for redirection
-//             details: {
-//                 enteredAmountUSD: amount,
-//                 totalAmountUSD: totalAmountUSD.toFixed(2),
-//                 totalAmountINR: totalAmountINR.toFixed(2),
-//                 processChargeUSD: processChargeUSD.toFixed(2),
-//                 exchangeRate: `1 USD = ₹${INR_TO_USD}`
-//             }
-//         });
-
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
+const client = new paypal.core.PayPalHttpClient(environment);
 
 
+export const creataddwalletFORPaypal = async (req, res) => {
+    try {
+        const { loginAuthId } = req.params;
+        const { amountUSD } = req.body;
+
+        const amount = parseFloat(amountUSD);
+        if (isNaN(amount)) {
+            return res.status(400).json({ message: "Invalid amountUSD" });
+        }
+
+        const processChargeUSD = (amount * 1) / 100;
+        const totalAmountUSD = amount + processChargeUSD;
+
+        const totalAmountINR = parseFloat((totalAmountUSD * INR_TO_USD).toFixed(2));
+
+        // PayPal order creation
+        const request = new paypal.orders.OrdersCreateRequest();
+        request.prefer('return=representation');
+        request.requestBody({
+            intent: 'CAPTURE',
+            purchase_units: [{
+                amount: {
+                    currency_code: 'USD',
+                    value: totalAmountUSD.toFixed(2)
+                },
+                description: `Payment for loginAuthId: ${loginAuthId}`,
+                custom_id: loginAuthId,
+                // Optionally add additional metadata for tracking
+                custom_id: `receipt_${Date.now()}`
+            }]
+        });
+
+        // Call PayPal API to create the order
+        const order = await client.execute(request);
+
+        // Find the approval link
+        const approvalUrl = order.result.links.find(link => link.rel === 'approve').href;
+
+        // Return order details and PayPal approval URL
+        res.json({
+            success: true,
+            order_id: order.result.id,
+            amount: totalAmountUSD.toFixed(2),
+            currency: 'USD',
+            paypalApprovalUrl: approvalUrl, // PayPal approval URL for redirection
+            details: {
+                enteredAmountUSD: amount,
+                totalAmountUSD: totalAmountUSD.toFixed(2),
+                totalAmountINR: totalAmountINR.toFixed(2),
+                processChargeUSD: processChargeUSD.toFixed(2),
+                exchangeRate: `1 USD = ₹${INR_TO_USD}`
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
-// export const verifyPaypalPayment = async (req, res) => {
-//     try {
-//         const { loginAuthId } = req.params;
-//         const { paypal_order_id, paypal_payment_id } = req.body;
 
-//         // Verify the payment with PayPal
-//         const request = new paypal.orders.OrdersCaptureRequest(paypal_order_id);
-//         request.requestBody({});
+
+export const verifyPaypalPayment = async (req, res) => {
+    try {
+        const { loginAuthId } = req.params;
+        const { paypal_order_id, paypal_payment_id } = req.body;
+
+        // Verify the payment with PayPal
+        const request = new paypal.orders.OrdersCaptureRequest(paypal_order_id);
+        request.requestBody({});
         
-//         const captureResponse = await client.execute(request);
+        const captureResponse = await client.execute(request);
 
-//         if (captureResponse.result.status !== 'COMPLETED') {
-//             return res.status(400).json({ message: "Payment verification failed" });
-//         }
+        if (captureResponse.result.status !== 'COMPLETED') {
+            return res.status(400).json({ message: "Payment verification failed" });
+        }
 
-//         // Extract relevant payment details
-//         const { amountUSD, processChargeUSD, totalAmountUSD, totalAmountINR } = req.body;
+        // Extract relevant payment details
+        const { amountUSD, processChargeUSD, totalAmountUSD, totalAmountINR } = req.body;
 
-//         // Save the wallet entry
-//         const newDeposit = new Wallet({
-//             loginAuthId,
-//             process_charge: processChargeUSD,
-//             USDTotalAmount: totalAmountUSD,
-//             IndianTotalAmout: totalAmountINR,
-//             paypal_order_id: paypal_order_id,
-//             paypal_payment_id: paypal_payment_id,
-//             amountUSD,
-//             status: "Paid"
-//         });
+        // Save the wallet entry
+        const newDeposit = new Wallet({
+            loginAuthId,
+            process_charge: processChargeUSD,
+            USDTotalAmount: totalAmountUSD,
+            IndianTotalAmout: totalAmountINR,
+            paypal_order_id: paypal_order_id,
+            paypal_payment_id: paypal_payment_id,
+            amountUSD,
+            status: "Paid"
+        });
 
-//         await newDeposit.save();
+        await newDeposit.save();
 
-//         res.json({ success: true, message: "Payment verified and wallet updated" });
+        res.json({ success: true, message: "Payment verified and wallet updated" });
 
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

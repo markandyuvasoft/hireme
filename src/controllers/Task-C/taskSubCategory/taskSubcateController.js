@@ -36,7 +36,7 @@ export const createTaskSubCategory = async (req, res) => {
 
         res.status(200).json({
             message: "task created successfully",
-            newTask : newTask
+            newTask: newTask
         })
     } catch (error) {
         res.status(500).json({
@@ -91,7 +91,7 @@ export const category_according_task = async (req, res) => {
 
         const checkTask = await TaskSubcategory.find({ taskCategoryId }).populate({
             path: "authId",
-            select: "firstName" 
+            select: "firstName"
         })
             .populate({
                 path: "taskCategoryId",
@@ -412,3 +412,49 @@ export const popular_review_rating_task = async (req, res) => {
         res.status(500).send({ message: error.message });
     }
 };
+
+
+
+
+export const search_task_by_title = async (req, res) => {
+
+    try {
+        const { searchTitle } = req.query;
+
+        if (!searchTitle) {
+            return res.status(400).json({
+                message: "Please provide a title to search."
+            });
+        }
+
+        const task = await TaskSubcategory.find({
+            taskTitle: { $regex: searchTitle, $options: 'i' }
+
+        })
+            .populate({
+                path: "authId",
+                select: "firstName lastName"
+            }).populate({
+                path: "taskCategoryId",
+                select: "task_category_title"
+            })
+
+        const total_of_service = task.length
+
+        if (task.length > 0) {
+            res.status(200).json({
+                message: "task found.",
+                task,
+                total_of_service
+            });
+        } else {
+            res.status(404).json({
+                message: "No task found with the given title."
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}

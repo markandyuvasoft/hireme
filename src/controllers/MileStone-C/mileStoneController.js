@@ -1,6 +1,7 @@
 import BidTask from "../../models/Bid-Task-M/bidTaskSchema.js";
 import Deposit from "../../models/Deposit-M/depositSchema.js";
 import MileStone from "../../models/MileStone-M/mileStoneSchema.js";
+import TaskFile from "../../models/TASK-FILE-M/TaskFileSchema.js";
 import TaskSubcategory from "../../models/Task-M/Task-subcategory/task-subcategory-schema.js";
 
 import Stripe from "stripe"
@@ -73,7 +74,7 @@ export const deatils_On_Task_MileStone = async (req, res) => {
                 let newStatus = null;
 
                 if (session.payment_status === "paid") {
-                    newStatus = "Paid";
+                    newStatus = "Released";
                 } else if (session.status === "expired") {
                     newStatus = "Cancelled";
                 }
@@ -119,7 +120,7 @@ export const deatils_On_Task_MileStone = async (req, res) => {
         const isAuthorized = milestones.some(milestone =>
             milestone.loginAuthId?._id.toString() === loginAuthId ||
             milestone.bidId?.TaskCreaterId?._id.toString() === loginAuthId ||
-            milestone.bidUserId?._id.toString() === loginAuthId 
+            milestone.bidUserId?._id.toString() === loginAuthId
         );
 
         if (!isAuthorized) {
@@ -229,5 +230,64 @@ export const createStripeInvoiceForMilestone = async (req, res) => {
 
 
 
+export const uploadTaskFiles = async (req, res) => {
+    try {
+        const { loginAuthId, taskCreatorId } = req.params;
+
+        const uploadFiles = req.file ? req.file.filename : null;
+
+        const saveFile = new TaskFile({
+            loginAuthId,
+            uploadFiles,
+            taskCreatorId
+        });
+
+        await saveFile.save();
+
+        res.status(200).json({
+            message: "File uploaded successfully",
+            files: saveFile
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
 
 
+export const getUploadedFiles = async (req, res) => {
+    try {
+        const { loginAuthId, taskCreatorId } = req.params;
+
+        const files = await TaskFile.find({
+            $or: [
+                { loginAuthId, taskCreatorId },
+                { loginAuthId: taskCreatorId, taskCreatorId: loginAuthId },
+            ],
+        }).populate({
+            path: "loginAuthId",
+            select: "firstName"
+        }).populate({
+            path: "taskCreatorId",
+            select: "firstName"
+        })
+
+        if (files.length === 0) {
+            return res.status(404).json({
+                message: "No files found for the given user and task creator"
+            });
+        }
+
+        res.status(200).json({
+            message: "Files fetched successfully",
+            files
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};

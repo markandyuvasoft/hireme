@@ -1,5 +1,5 @@
 import express from "express"
-import { addDeposit, creataddwallet, createAddWalletStripe, getDepositTrans, manageStatus, verifyRazorpayPayment, verifyStripePayment } from "../../controllers/Deposit-C/depositController.js"
+import { addDeposit, creataddwallet, creataddwalletFORPaypal, createAddWalletStripe, getDepositTrans, manageStatus, verifyRazorpayPayment, verifyStripePayment } from "../../controllers/Deposit-C/depositController.js"
 import bodyParser from 'body-parser';
 
 const depositRouter = express.Router()
@@ -19,7 +19,7 @@ depositRouter.put("/addtocardStripe/:loginAuthId", createAddWalletStripe)
 
 depositRouter.get('/verifyStripe/:sessionId', verifyStripePayment);
 
-// depositRouter.put("/addtocardpaypal/:loginAuthId", creataddwalletFORPaypal)
+depositRouter.put("/addtocardpaypal/:loginAuthId", creataddwalletFORPaypal)
 
 
 

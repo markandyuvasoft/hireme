@@ -38,6 +38,7 @@ export const getMessages = async (req, res) => {
 
 
 export const getAllUserChat = async (req, res) => {
+  
   const { authId } = req.params;
 
   try {

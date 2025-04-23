@@ -135,47 +135,23 @@ io.on("connection", (socket) => {
     console.log(`User with ID: ${userId} joined their room`);
   });
 
-  // socket.on("send_message", async (data) => {
-  //   const { senderId, receiverId, content } = data;
-
-  //   try {
-  //     const newMessage = new Message({ senderId, receiverId, content });
-  //     const savedMessage = await newMessage.save();
-
-  //     // io.to(receiverId).emit("receive_message", savedMessage);
-
-  //     io.to(senderId).emit("receive_message", savedMessage);
-  //     io.to(receiverId).emit("receive_message", savedMessage);
-
-  //   } catch (err) {
-  //     console.error("Message save error:", err);
-  //     socket.emit("error_message", { message: "Failed to send message" });
-  //   }
-  // });
-
-
   socket.on("send_message", async (data) => {
     const { senderId, receiverId, content } = data;
-  
-    console.log("🔥 send_message called");
-    console.log("Data received:", data);
-    console.log("Socket ID:", socket.id);
-  
+
     try {
       const newMessage = new Message({ senderId, receiverId, content });
       const savedMessage = await newMessage.save();
-  
-      console.log("✅ Message saved:", savedMessage);
-  
-      io.to(receiverId).emit("receive_message", savedMessage);
+
+      // io.to(receiverId).emit("receive_message", savedMessage);
+
       io.to(senderId).emit("receive_message", savedMessage);
-  
-      console.log(`📨 Message sent to receiver (${receiverId}) and sender (${senderId})`);
+      io.to(receiverId).emit("receive_message", savedMessage);
+
     } catch (err) {
-      console.error("❌ Message save error:", err);
+      console.error("Message save error:", err);
+      socket.emit("error_message", { message: "Failed to send message" });
     }
   });
-  
 
   socket.on("disconnect", () => {
     console.log("User disconnected: " + socket.id);

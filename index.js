@@ -144,7 +144,7 @@ io.on("connection", (socket) => {
 
       // io.to(receiverId).emit("receive_message", savedMessage);
 
-      io.to(senderId).emit("receive_message", savedMessage);
+      io.to(senderId).emit("send_message", savedMessage);
       io.to(receiverId).emit("receive_message", savedMessage);
 
     } catch (err) {

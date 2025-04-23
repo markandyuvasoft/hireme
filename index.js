@@ -115,13 +115,17 @@ app.use("/api/v1", messageRouter);
 // Static file serving
 app.use("/", express.static("public/upload"));
 
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: {
+//     origin: "*",
+//     methods: ["GET", "POST"],
+//   },
+// });
+
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
+const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
+
 
 io.on("connection", (socket) => {
   console.log("User connected: " + socket.id);
@@ -138,7 +142,11 @@ io.on("connection", (socket) => {
       const newMessage = new Message({ senderId, receiverId, content });
       const savedMessage = await newMessage.save();
 
-      io.to(receiverId).emit("receive_message", savedMessage);
+      // io.to(receiverId).emit("receive_message", savedMessage);
+
+      io.to(senderId).emit("receive_message", savedMessage);
+io.to(receiverId).emit("receive_message", savedMessage);
+
     } catch (err) {
       console.error("Message save error:", err);
       socket.emit("error_message", { message: "Failed to send message" });

@@ -77,8 +77,8 @@ export const addDeposit = async (req, res) => {
                 quantity: 1,
             }],
             mode: "payment",
-            success_url: `https://hiremejobs.netlify.app/taskSubDetailed/${taskId}?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://hiremejobs.netlify.app/cancel`,
+            success_url: `https://hiremejobs.vercel.app/taskSubDetailed/${taskId}?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://hiremejobs.vercel.app/cancel`,
 
             metadata: {
                 loginAuthId,
@@ -498,8 +498,8 @@ export const createAddWalletStripe = async (req, res) => {
                 totalAmountUSD: totalAmountUSD.toFixed(2),
                 exchangeRate: `1 USD = ₹${INR_TO_USD}`
             },
-            success_url: `https://hiremejobs.netlify.app/user/deposit?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://hiremejobs.netlify.app/user/deposit`,
+            success_url: `https://hiremejobs.vercel.app/user/deposit?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://hiremejobs.vercel.app/user/deposit`,
         });
 
         res.json({

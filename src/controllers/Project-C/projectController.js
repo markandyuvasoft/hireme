@@ -4,6 +4,7 @@ import Wallet from "../../models/Deposit-M/walletSchema.js";
 import Draft from "../../models/Draft-M/draftSchema.js";
 import Project from "../../models/Project-M/projectSchema.js";
 import Service from "../../models/Service-M/serviceSchema.js";
+import TaskSubcategory from "../../models/Task-M/Task-subcategory/task-subcategory-schema.js";
 
 
 // get the single service quote use serviceId
@@ -205,6 +206,8 @@ export const fetchDeshboardDetails = async (req, res) => {
 
         const check_public_service = (await Service.find({ authId })).length
 
+        const totalCreatedTask = (await TaskSubcategory.find({ authId })).length
+
         const totalServices = check_draft_service + check_public_service;
 
         const deposits = await Wallet.find({loginAuthId : authId });
@@ -220,6 +223,7 @@ export const fetchDeshboardDetails = async (req, res) => {
                 totalProjects: project_details,
                 totalServices: totalServices,
                 totalDepositAmount: totalDepositAmount,
+                totalCreatedTask : totalCreatedTask
             })
         }
 

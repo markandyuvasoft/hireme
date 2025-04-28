@@ -79,12 +79,13 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on('typing', (data) => {
-    socket.to(data.receiverId).emit('typing', { senderId: data.senderId });
+  socket.on("typing", (data) => {
+    const { senderId, receiverId } = data;
+    socket.to(receiverId).emit("typing", { senderId });
   });
-  
-  socket.on('stopTyping', (data) => {
-    socket.to(data.receiverId).emit('stopTyping', { senderId: data.senderId });
+  socket.on("stopTyping", (data) => {
+    const { senderId, receiverId } = data;
+    socket.to(receiverId).emit("stopTyping", { senderId });
   });
 
   socket.on("disconnect", () => {

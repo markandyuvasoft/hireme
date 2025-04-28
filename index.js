@@ -78,6 +78,15 @@ io.on("connection", (socket) => {
     }
   });
 
+
+  socket.on('typing', (data) => {
+    socket.to(data.receiverId).emit('typing', { senderId: data.senderId });
+  });
+  
+  socket.on('stopTyping', (data) => {
+    socket.to(data.receiverId).emit('stopTyping', { senderId: data.senderId });
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected: " + socket.id);
   });

@@ -458,3 +458,48 @@ export const search_task_by_title = async (req, res) => {
         });
     }
 }
+
+
+
+
+export const getAllTaskRunning = async (req, res) => {
+    try {
+        const { userID } = req.params;
+
+        const tasks = await BidTask.find({ TaskCreaterId: userID }).populate({
+            path : "taskId",
+            select : "taskTitle"
+        }).populate({
+            path : "loginAuthId",
+            select : "firstName lastName"
+        })
+        .populate({
+            path : "TaskCreaterId",
+            select : "firstName lastName"
+        })
+
+        const filteredTasks = tasks.filter(task => 
+            task.confirmation_bid_user === "Accepted" && task.status === "Alloted"
+        );
+
+        const filteredTasks2 = tasks.filter(task => 
+            task.confirmation_bid_user === "Rejected" && task.status === "Alloted"
+        );
+
+        if (filteredTasks.length > 0) {
+            res.status(200).json({
+                message: "Alloted tasks with 'Accepted' confirmation are",
+                runningTask: filteredTasks,
+                rejectedTask : filteredTasks2
+            });
+        } else {
+            res.status(404).json({
+                message: "No tasks found with confirmation_bid_user as 'Accepted' and status as 'Alloted'"
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};

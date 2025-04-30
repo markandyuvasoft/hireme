@@ -1,5 +1,5 @@
 import express from "express"
-import { auth_according_task, category_according_task, createTaskSubCategory, deleteTask, found_single_task, getAllTask, popular_review_rating_task, review_and_rating_task, search_task_by_title, searchTasks, updateTask } from "../../../controllers/Task-C/taskSubCategory/taskSubcateController.js";
+import { auth_according_task, category_according_task, createTaskSubCategory, deleteTask, found_single_task, getAllTask, getAllTaskRunning, popular_review_rating_task, review_and_rating_task, search_task_by_title, searchTasks, updateTask } from "../../../controllers/Task-C/taskSubCategory/taskSubcateController.js";
 import { upload } from "../../../common/image.js";
 
 
@@ -27,6 +27,10 @@ taskSubcategoryRouter.get("/popular-rating-task", popular_review_rating_task)
 
 
 taskSubcategoryRouter.get("/search-on-tasks", search_task_by_title)
+
+
+taskSubcategoryRouter.get("/running/:userID", getAllTaskRunning)
+
 
 
 
